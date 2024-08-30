@@ -1,7 +1,7 @@
 ## VAULT FACE
 
-Coffre-fort de données sensibles
+Stockage sécurisé de données sensibles
 
-Cet utilitaire permet de protéger vos données de manière sécurisée.
-Les données dites sensibles ne sont plus exposées dans un fichier mais chiffrées pour éviter tout priatage.
+
+Avec cet utilitaire, vous pouvez protéger vos données de manière sécurisée. Afin d'éviter tout risque de piratage, les données sensibles ne sont plus exposées de manière lisible dans un fichier, mais chiffrées. Vault Face vous donne la possibilité d'accéder à vos données à tout moment.
 
