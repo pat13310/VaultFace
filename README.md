@@ -1,4 +1,4 @@
-##VAULT FACE
+## VAULT FACE
 
 Coffre-fort de données sensibles
 
