@@ -1,0 +1,37 @@
+{
+    "nom": "Coffre-fort",
+    "encodage": "root",
+    "valeur": "",
+    "type": "root",
+    "children": [
+        {
+            "nom": "OPEN AI",
+            "encodage": "",
+            "valeur": "AES",
+            "type": "folder",
+            "children": [
+                {
+                    "nom": "Clef_API",
+                    "encodage": "DES ",
+                    "valeur": "581",
+                    "type": "data",
+                    "children": []
+                },
+                {
+                    "nom": "Data",
+                    "encodage": "AES",
+                    "valeur": "472",
+                    "type": "data",
+                    "children": []
+                },
+                {
+                    "nom": "paraphrase",
+                    "encodage": "DES ",
+                    "valeur": "",
+                    "type": "data",
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+<svg id="Layer_2_00000170250757447390287190000015776313655061979312_" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <linearGradient id="_07_00000029755258818083298340000008670159276910869436_" gradientTransform="matrix(1 0 0 -1 0 513)" gradientUnits="userSpaceOnUse" x1="38.047" x2="445.778" y1="444.97" y2="37.239">
+    <stop offset="0" stop-color="#ffc713"/>
+    <stop offset="1" stop-color="#ff8c00"/>
+  </linearGradient>
+  <g id="Icon" transform="scale(0.8, 0.7)">
+    <path id="_07" d="m40 143.5v-65c0-16.6 13.4-30 30-30h123.4c12.9 0 25.4 4.2 35.8 11.8l43.9 32.7c10.4 7.7 22.9 11.8 35.8 11.8h133.1c16.6 0 30 13.4 30 30v8.6h-432zm-35.6 43.8 32.3 250c1.9 15 14.7 26.2 29.7 26.2h379.2c15.1 0 27.8-11.2 29.8-26.2l32.3-250c2.3-17.9-11.7-33.8-29.8-33.8h-443.8c-18.1 0-32.1 15.9-29.7 33.8z" fill="url(#_07_00000029755258818083298340000008670159276910869436_)"/>
+  </g>
+</svg>
