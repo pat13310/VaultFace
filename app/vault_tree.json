@@ -1,35 +1,18 @@
 {
     "nom": "Coffre-fort",
-    "encodage": "root",
-    "valeur": "",
     "type": "root",
     "children": [
         {
-            "nom": "OPEN AI",
-            "encodage": "",
-            "valeur": "AES",
+            "nom": "OPEN",
             "type": "folder",
             "children": [
                 {
-                    "nom": "Clef_API",
-                    "encodage": "DES ",
-                    "valeur": "581",
+                    "nom": "Clef",
                     "type": "data",
-                    "children": []
-                },
-                {
-                    "nom": "Data",
                     "encodage": "AES",
-                    "valeur": "472",
-                    "type": "data",
-                    "children": []
-                },
-                {
-                    "nom": "paraphrase",
-                    "encodage": "DES ",
-                    "valeur": "",
-                    "type": "data",
-                    "children": []
+                    "valeur": "RD970NE8Cm4BEnSpqiNbfndrY55MAgmBHioCMf8CMZPrMbq8jw40d50iirqm28//C0hcihqFBXZPyUKcANjcRaraOHtRwf52T9SgDm3Z16Qhs4X2aUOzsWLIenCET9k42Xd+yO2DYhnhcszeVJgzYHxD4xdPdN5O65Ebxm+mpQg=",
+                    "key": "fca274b1c84dc23aaf8f34ff8e4a0d74c44b3ff081b22dec6c6a0c13255e0df3",
+                    "iv": "3b8400c4df1fb387f17dcb210e5e0094"
                 }
             ]
         }

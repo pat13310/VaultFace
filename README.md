@@ -45,6 +45,53 @@ Vault Face est conçu pour être adaptatif aux nouvelles menaces de sécurité. 
 - **Gestion de Clés de Cryptographie** : Conserve des clés de chiffrement privées ou d'autres informations de sécurité de manière sûre et contrôlée.
 - **Protection des Informations Personnelles** : Garantit que les données personnelles (comme les numéros de carte d'identité, les numéros de sécurité sociale, ou les coordonnées bancaires) ne sont jamais exposées directement.
 
+
+
+### Tableau Résumé des chiffrements et clés dans la Classe `Cypher`
+Voici un tableau récapitulatif de la classe `Cypher`, indiquant les différents algorithmes de chiffrement pris en charge ainsi que les clés associées nécessaires pour chaque type de chiffrement.
+
+| **Algorithme**  | **Type de Clé**             | **Longueur de la Clé** | **Paramètres Associés**        | **Description**                                                                                     |
+|-----------------|-----------------------------|-------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------|
+| **AES**         | Clé symétrique (`self.key`) | 128, 192, 256 bits      | IV (`self.iv`), 16 octets      | Chiffrement symétrique utilisant AES en mode CBC. Utilise une clé symétrique et un vecteur d'initialisation. |
+| **DES**         | Clé symétrique (`self.key`) | 56 bits (7 octets)      | IV (`self.iv`), 8 octets       | Chiffrement symétrique utilisant DES en mode CBC. Utilise une clé de 56 bits et un IV de 64 bits.            |
+| **3DES (Triple DES)** | Clé symétrique (`self.key`) | 112 ou 168 bits        | IV (`self.iv`), 8 octets       | Version améliorée de DES, effectue trois passes de chiffrement. Utilise une clé symétrique de 112 ou 168 bits.|
+| **ChaCha20**    | Clé symétrique (`self.key`) | 256 bits (32 octets)    | Nonce (`self.nonce`), 16 octets | Chiffrement symétrique utilisant ChaCha20. Utilise une clé symétrique de 256 bits et un nonce de 128 bits.   |
+| **RSA**         | Clé asymétrique (`self.public_key` et `self.private_key`) | Variable (2048, 4096 bits typiquement) | Aucun                        | Chiffrement asymétrique utilisant RSA. Utilise une clé publique pour le chiffrement et une clé privée pour le déchiffrement. |
+| **Blowfish**    | Clé symétrique (`self.key`) | Variable (32 à 448 bits) | Aucun                         | Chiffrement symétrique utilisant Blowfish. La longueur de la clé peut varier entre 32 et 448 bits.            |
+
+### Détails sur Chaque Algorithme
+
+1. **AES (Advanced Encryption Standard)**
+   - Utilise une clé symétrique pour chiffrer et déchiffrer les données.
+   - Nécessite un vecteur d'initialisation (IV) de 16 octets.
+   - Convient pour des opérations de chiffrement rapide et sécurisé sur de grands volumes de données.
+
+2. **DES (Data Encryption Standard)**
+   - Utilise une clé symétrique de 56 bits.
+   - Désuet et moins sécurisé que les autres algorithmes; principalement pour la compatibilité historique.
+   - Nécessite un vecteur d'initialisation (IV) de 8 octets.
+
+3. **3DES (Triple DES)**
+   - Amélioration du DES classique par application du chiffrement trois fois.
+   - Utilise une clé de 112 ou 168 bits et un IV de 8 octets.
+   - Plus sécurisé que DES mais plus lent comparé à AES.
+
+4. **ChaCha20**
+   - Utilise une clé symétrique de 256 bits et un nonce de 16 octets.
+   - Conçu pour offrir une sécurité élevée et des performances rapides, même sur des matériels ne supportant pas AES matériellement.
+   - Adapté pour les applications nécessitant un chiffrement rapide, comme les communications en temps réel.
+
+5. **RSA (Rivest-Shamir-Adleman)**
+   - Utilise une paire de clés asymétriques (publique et privée).
+   - La clé publique chiffre les données; seule la clé privée correspondante peut les déchiffrer.
+   - Idéal pour le chiffrement de petites quantités de données, comme les clés de session pour les algorithmes symétriques.
+
+6. **Blowfish**
+   - Utilise une clé symétrique dont la longueur peut varier entre 32 et 448 bits.
+   - Un des premiers algorithmes de chiffrement rapide destiné à remplacer DES.
+   - Convient pour les applications nécessitant une flexibilité dans la taille de clé.
+
+
 ## Conclusion
 
 Vault Face est une solution de stockage sécurisé innovante et fiable, adaptée à tous ceux qui cherchent à protéger leurs données sensibles de manière proactive. En combinant des algorithmes de chiffrement de pointe avec une interface simple d'utilisation et un accès sécurisé, Vault Face offre une défense efficace contre les menaces de sécurité modernes, tout en restant facile à utiliser pour une large audience.

@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 
@@ -6,6 +7,8 @@ from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QMainWindow, QTreeWidgetItem, QApplication, QMessageBox, QDialog, QTableWidgetItem, \
     QAbstractItemView, QHeaderView
 from cryptography.fernet import Fernet
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 from app.Cypher import Cypher
 from app.InfoDlg import InfoDlg
@@ -199,7 +202,7 @@ class VaultFace(QMainWindow, Ui_VaultFace):
             valeur_chiffree = selected_item.text(2)
 
             try:
-                decrypted_value = self.cypher.decrypt_value(valeur_chiffree, algorithm=encodage.lower())
+                decrypted_value = self.cypher.decrypt(valeur_chiffree, algorithm=encodage.lower())
                 selected_item.setText(2, decrypted_value)
                 self.info_box.setMessage(f"Le texte a été déchiffré avec {encodage}.")
                 self.info_box.showModal()
@@ -212,20 +215,40 @@ class VaultFace(QMainWindow, Ui_VaultFace):
 
     def save_tree_cache(self):
         def serialize_item(item):
-            # Récupérer les données de chaque élément
+            # Récupérer les données de base de chaque élément
+            serialized = {
+                "nom": item.text(0),  # Nom de l'élément
+                "type": item.data(0, Qt.UserRole),  # Type de l'élément (folder, data, etc.)
+            }
+
+            # Traitement spécifique pour les éléments de type "data"
+            if serialized["type"] == "data":
+                serialized["encodage"] = item.text(2)  # Type d'encodage (colonne 2)
+                valeur = item.text(1)  # Valeur à chiffrer
+
+                try:
+                    if valeur:
+                        encrypted_value, keys = self.cypher.encrypt(valeur, algorithm=serialized["encodage"].lower())
+                        # Encoder la valeur chiffrée en base64
+                        serialized["valeur"] = base64.b64encode(encrypted_value).decode('utf-8')
+                        # Ajouter les clés au dictionnaire
+                        for key, value in keys.items():
+                            serialized[key] = f"{value}"
+                        print(f"Valeur chiffrée pour {serialized['nom']} : {encrypted_value}")  # Pour le débogage
+                except Exception as e:
+                    print(f"Erreur lors du chiffrement de la valeur : {e}")
+                    serialized["valeur"] = ""  # En cas d'erreur, on stocke une chaîne vide
+
+            # Récupérer les enfants pour tous les types d'éléments
             children = []
             for i in range(item.childCount()):
                 child = item.child(i)
                 children.append(serialize_item(child))
 
-            # Récupérer les propriétés de l'élément
-            return {
-                "nom": item.text(0),  # Nom de l'élément
-                "encodage": item.text(2),  # Type d'encodage (colonne 2)
-                "valeur": item.text(1),  # Valeur de l'élément (colonne 1)
-                "type": item.data(0, Qt.UserRole),  # Type de l'élément (folder, data, etc.)
-                "children": children  # Liste des enfants de l'élément
-            }
+            if children:
+                serialized["children"] = children
+
+            return serialized
 
         tree_data = serialize_item(self.vault_item)
         try:
@@ -235,21 +258,74 @@ class VaultFace(QMainWindow, Ui_VaultFace):
         except Exception as e:
             print(f"Erreur lors de la sauvegarde du fichier JSON: {e}")  # Débogage
 
+    def hex_to_bytes(self, hex_string):
+        # Nettoyer la chaîne en supprimant les caractères indésirables (guillemets, espaces)
+        cleaned_hex_string = hex_string.strip().replace("'", "").replace('"', "").replace(" ", "")
+
+        # Vérifier que la chaîne ne contient que des caractères hexadécimaux
+        if all(c in '0123456789abcdefABCDEF' for c in cleaned_hex_string):
+            return bytes.fromhex(cleaned_hex_string)
+        else:
+            raise ValueError(f"La chaîne contient des caractères non valides : {hex_string}")
+
     def load_tree_cache(self):
         def deserialize_item(data):
             # Créer un QTreeWidgetItem avec le texte de l'élément
-            item = QTreeWidgetItem([data.get("nom", ""), data.get("valeur", ""), data.get("encodage", "")])
+            nom = data.get("nom", "")
             item_type = data.get("type", "folder")
-            item.setData(0, Qt.UserRole, item_type)
 
-            # Appliquer les propriétés en fonction du type
             if item_type == "folder":
+                item = QTreeWidgetItem([nom, "", ""])
+                item.setData(0, Qt.UserRole, item_type)
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
                 item.setIcon(0, self.folder_icon)
             elif item_type == "data":
+                valeur_chiffree = data.get("valeur", "")
+                valeur_dechiffree = ""
+                encodage = data.get("encodage", "")
+                key = data.get("key", "")
+                iv = data.get("iv", "")
+                public_key = data.get("public_key", "")
+                private_key = data.get("private_key", "")
+
+                # Convertir les clés en bytes si nécessaire
+                try:
+                    if key:
+                        self.cypher.key = self.hex_to_bytes(key)
+                    if iv:
+                        self.cypher.iv = self.hex_to_bytes(iv)
+                    if public_key:
+                        self.cypher.public_key = serialization.load_pem_public_key(
+                            public_key.encode('utf-8'),
+                            backend=default_backend()
+                        )
+                    if private_key:
+                        self.cypher.private_key = serialization.load_pem_private_key(
+                            private_key.encode('utf-8'),
+                            password=None,
+                            backend=default_backend()
+                        )
+                except ValueError as e:
+                    print(f"Erreur lors de la conversion des clés : {e}")
+
+                # Convertir la valeur chiffrée de base64 à bytes et déchiffrer
+                try:
+                    if valeur_chiffree:
+                        valeur_chiffree_bytes = base64.b64decode(valeur_chiffree.encode('utf-8'))
+                        valeur_dechiffree = self.cypher.decrypt(valeur_chiffree_bytes, algorithm=encodage.lower())
+                        print(f"Valeur déchiffrée pour {nom} : {valeur_dechiffree}")
+                except Exception as e:
+                    print(f"Erreur lors du déchiffrement de la valeur : {e}")
+
+                item = QTreeWidgetItem([nom, valeur_dechiffree, encodage])
+                item.setData(0, Qt.UserRole, item_type)
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
                 item.setIcon(0, self.data_icon)
+                item.setText(1, valeur_dechiffree)
+                item.setText(2, encodage)
             else:
+                item = QTreeWidgetItem([nom, "", ""])
+                item.setData(0, Qt.UserRole, item_type)
                 item.setIcon(0, self.vault_icon)
 
             # Désérialiser les enfants
@@ -257,7 +333,6 @@ class VaultFace(QMainWindow, Ui_VaultFace):
                 child_item = deserialize_item(child_data)
                 child_item.setFlags(child_item.flags() | Qt.ItemIsEditable)
                 item.addChild(child_item)
-
             return item
 
         try:
@@ -320,7 +395,6 @@ class VaultFace(QMainWindow, Ui_VaultFace):
             self.edit_parent.setText(self.current_folder.text(0))
             self.edit_value.setText(item.data(1, Qt.DisplayRole))
             self.select_cyfer.setCurrentText(item.data(2, Qt.DisplayRole))
-            # self.select_cyfer.setCurrentIndex(item.data(1,Qt.DisplayRole))
             self.stackedWidget.setCurrentWidget(self.page_data)  # Affiche la page de dossier
             self.current_data = item
         else:
